@@ -1,8 +1,5 @@
 #! /bin/bash
 
-curl -fsSL https://get.docker.com | sh
-apt install -y --no-install-recommends emacs-nox git nodejs npm jq
-
 set -e
 
 ## Runtime
