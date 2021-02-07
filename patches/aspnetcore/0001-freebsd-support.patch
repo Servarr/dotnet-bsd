@@ -23,18 +23,6 @@ index 07e3d34055..ac32e584ac 100644
        osx-x64;
        linux-musl-x64;
        linux-musl-arm;
-diff --git a/NuGet.config b/NuGet.config
-index 8b21c1e0ec..0c22239b8b 100644
---- a/NuGet.config
-+++ b/NuGet.config
-@@ -17,6 +17,7 @@
-     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-     <!-- Used for the SiteExtension 3.1 bits that are included in the 5.0 build -->
-     <add key="dotnet31-transport" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet3.1-transport/nuget/v3/index.json" />
-+    <add key="local" value="../runtime/artifacts/packages/Release/Shipping"/>
-   </packageSources>
-   <disabledPackageSources>
-     <add key="darc-int-dotnet-runtime-681e2c3" value="true" />
 diff --git a/eng/Dependencies.props b/eng/Dependencies.props
 index 36a24451f0..5a5a2fa9dd 100644
 --- a/eng/Dependencies.props
@@ -47,32 +35,5 @@ index 36a24451f0..5a5a2fa9dd 100644
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.osx-x64" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-arm" />
-diff --git a/eng/Versions.props b/eng/Versions.props
-index 4db7209fb8..8a91482f50 100644
---- a/eng/Versions.props
-+++ b/eng/Versions.props
-@@ -58,7 +58,7 @@
-   <PropertyGroup Label="Automated">
-     <!-- Packages from dotnet/runtime -->
-     <MicrosoftExtensionsDependencyModelPackageVersion>5.0.0</MicrosoftExtensionsDependencyModelPackageVersion>
--    <MicrosoftNETCoreAppInternalPackageVersion>5.0.2-servicing.20611.20</MicrosoftNETCoreAppInternalPackageVersion>
-+    <MicrosoftNETCoreAppInternalPackageVersion>5.0.2</MicrosoftNETCoreAppInternalPackageVersion>
-     <MicrosoftNETCoreAppRefPackageVersion>5.0.0</MicrosoftNETCoreAppRefPackageVersion>
-     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>5.0.2</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-     <MicrosoftNETCoreBrowserDebugHostTransportPackageVersion>5.0.2-servicing.20611.20</MicrosoftNETCoreBrowserDebugHostTransportPackageVersion>
-diff --git a/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj b/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
-index dd7368806f..8b7a7b9ff6 100644
---- a/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
-+++ b/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
-@@ -46,7 +46,7 @@ This package is an internal implementation of the .NET Core SDK and is not meant
- 
-     <!-- Produce crossgen profiling symbols (.ni.pdb or .map files). -->
-     <GenerateCrossgenProfilingSymbols>true</GenerateCrossgenProfilingSymbols>
--    <GenerateCrossgenProfilingSymbols Condition=" '$(CrossgenOutput)' != 'true' OR '$(TargetOsName)' == 'osx' ">false</GenerateCrossgenProfilingSymbols>
-+    <GenerateCrossgenProfilingSymbols Condition=" '$(CrossgenOutput)' != 'true' OR '$(TargetOsName)' == 'osx' OR '$(TargetOsName)' == 'freebsd' ">false</GenerateCrossgenProfilingSymbols>
- 
-     <!-- Always generated, even though output type == Library -->
-     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
--- 
 2.25.1
 

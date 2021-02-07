@@ -71,6 +71,7 @@ stages:
           - bash: |
               git -C aspnetcore checkout $DOTNETTAG
               git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
+              dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
             inputs:
@@ -106,6 +107,10 @@ stages:
           - bash: |
               git -C installer checkout $SDKTAG
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
+              dotnet nuget remove source msbuild --configfile installer/NuGet.config
+              dotnet nuget remove source nuget-build --configfile installer/NuGet.config
+              dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
+              dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping --name aspnetcore --configfile installer/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
             inputs:
