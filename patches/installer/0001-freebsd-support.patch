@@ -9,26 +9,6 @@ Subject: [PATCH] freebsd support
  src/redist/targets/GetRuntimeInformation.targets   | 2 +-
  3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/NuGet.config b/NuGet.config
-index 40744f85e..43414ae3c 100644
---- a/NuGet.config
-+++ b/NuGet.config
-@@ -31,13 +31,13 @@
-     <add key="dotnet-eng" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json" />
-     <add key="dotnet-core" value="https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" />
-     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
--    <add key="msbuild" value="https://dotnet.myget.org/F/msbuild/api/v3/index.json" />
--    <add key="nuget-build" value="https://dotnet.myget.org/F/nuget-build/api/v3/index.json" />
-     <add key="dotnet3-transport" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet3-transport/nuget/v3/index.json" />
-     <add key="dotnet3.1-transport" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet3.1-transport/nuget/v3/index.json" />
-     <add key="dotnet5" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" />
-     <add key="dotnet5-transport" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5-transport/nuget/v3/index.json" />
-     <add key="darc-pub-dotnet-templating-247f60e9" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/darc-pub-dotnet-templating-247f60e9/nuget/v3/index.json" />
-+    <add key="runtime" value="../runtime/artifacts/packages/Release/Shipping"/>
-+    <add key="aspnetcore" value="../aspnetcore/artifacts/packages/Release/Shipping/"/>
-   </packageSources>
-   <disabledPackageSources>
-     <!--  Begin: Package sources from dotnet-aspnetcore -->
 diff --git a/src/redist/targets/GenerateBundledVersions.targets b/src/redist/targets/GenerateBundledVersions.targets
 index 43b35ea06..00c2520b3 100644
 --- a/src/redist/targets/GenerateBundledVersions.targets
