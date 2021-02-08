@@ -1,6 +1,14 @@
+parameters:
+- name: runtimeBranch
+  displayName: Branch for runtime and aspnetcore repositories
+  type: string
+  default: v5.0.2
+- name: sdkBranch
+  displayName: Branch for installer repository
+  type: string
+  default: v5.0.102
+
 variables:
-  dotnetTag: 'v5.0.2'
-  sdkTag: 'v5.0.102'
   runCounter: $[counter('runNumber', 1)]
 
 resources:
@@ -9,17 +17,17 @@ resources:
     type: github
     endpoint: Servarr
     name: dotnet/runtime
-    tag: release/5.0
+    ref: release/5.0
   - repository: aspnetcore
     type: github
     endpoint: Servarr
     name: dotnet/aspnetcore
-    tag: release/5.0
+    ref: release/5.0
   - repository: installer
     type: github
     endpoint: Servarr
     name: dotnet/installer
-    tag: release/5.0.1xx
+    ref: release/5.0.1xx
 
 trigger:
   branches:
@@ -38,7 +46,9 @@ stages:
     jobs:
       - job: Setup
         steps:
-        - bash: echo "##vso[build.updatebuildnumber]${DOTNETTAG}-${RUNCOUNTER}"
+        - bash: |
+            BRANCH=${{ parameters.runtimeBranch }}
+            echo "##vso[build.updatebuildnumber]${BRANCH/\//-}-${RUNCOUNTER}"
           displayName: Set Build Name
 
       - job: Runtime
@@ -47,7 +57,7 @@ stages:
           - checkout: self
           - checkout: runtime
           - bash: |
-              git -C runtime checkout $DOTNETTAG
+              git -C runtime checkout ${{ parameters.runtimeBranch }}
             displayName: Checkout release tag
           - bash: |
               DOTNET_DOCKER_TAG="mcr.microsoft.com/dotnet-buildtools/prereqs:$(curl -s https://raw.githubusercontent.com/dotnet/versions/master/build-info/docker/image-info.dotnet-dotnet-buildtools-prereqs-docker-master.json | jq -r '.repos[0].images[] | select(.platforms[0].dockerfile | contains("freebsd/11")) | .platforms[0].simpleTags[0]')"
@@ -69,7 +79,7 @@ stages:
           - checkout: aspnetcore
             submodules: true
           - bash: |
-              git -C aspnetcore checkout $DOTNETTAG
+              git -C aspnetcore checkout ${{ parameters.runtimeBranch }}
               git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
             displayName: Apply patches
@@ -105,7 +115,7 @@ stages:
           - checkout: self
           - checkout: installer
           - bash: |
-              git -C installer checkout $SDKTAG
+              git -C installer checkout ${{ parameters.sdkBranch }}
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
               dotnet nuget remove source msbuild --configfile installer/NuGet.config
               dotnet nuget remove source nuget-build --configfile installer/NuGet.config
