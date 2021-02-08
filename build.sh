@@ -2,8 +2,8 @@
 
 set -e
 
-RUNTIMETAG=v5.0.2
-SDKTAG=v5.0.102
+RUNTIMETAG=release/5.0
+SDKTAG=release/5.0.1xx
 
 ## Runtime
 git clone --depth 1 --branch $RUNTIMETAG https://github.com/dotnet/runtime.git
@@ -15,6 +15,7 @@ docker run -e ROOTFS_DIR=/crossrootfs/x64 -v $(pwd)/runtime:/runtime $DOTNET_DOC
 git clone --recursive --depth 1 --branch $RUNTIMETAG https://github.com/dotnet/aspnetcore.git
 git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
 dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile aspnetcore/NuGet.config
+dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile aspnetcore/NuGet.config
 
 mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
 cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-5.*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
@@ -28,6 +29,7 @@ dotnet nuget remove source msbuild --configfile installer/NuGet.config
 dotnet nuget remove source nuget-build --configfile installer/NuGet.config
 dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
 dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping --name aspnetcore --configfile installer/NuGet.config
+dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile installer/NuGet.config
 
 mkdir -p installer/artifacts/obj/redist/Release/downloads/
 cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
