@@ -2,11 +2,11 @@ parameters:
 - name: runtimeBranch
   displayName: Branch for runtime and aspnetcore repositories
   type: string
-  default: v5.0.2
+  default: v5.0.3
 - name: sdkBranch
   displayName: Branch for installer repository
   type: string
-  default: v5.0.102
+  default: v5.0.103
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -58,7 +58,8 @@ stages:
           - checkout: runtime
           - bash: |
               git -C runtime checkout ${{ parameters.runtimeBranch }}
-            displayName: Checkout release tag
+              sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
+            displayName: Checkout and patch
           - bash: |
               DOTNET_DOCKER_TAG="mcr.microsoft.com/dotnet-buildtools/prereqs:$(curl -s https://raw.githubusercontent.com/dotnet/versions/master/build-info/docker/image-info.dotnet-dotnet-buildtools-prereqs-docker-master.json | jq -r '.repos[0].images[] | select(.platforms[0].dockerfile | contains("freebsd/11")) | .platforms[0].simpleTags[0]')"
               docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/build.sh -c Release -cross -os freebsd
@@ -82,6 +83,7 @@ stages:
               git -C aspnetcore checkout ${{ parameters.runtimeBranch }}
               git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
+              sed -i '/\/dnceng\/internal\//d' aspnetcore/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
             inputs:
@@ -121,6 +123,7 @@ stages:
               dotnet nuget remove source nuget-build --configfile installer/NuGet.config
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
               dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping --name aspnetcore --configfile installer/NuGet.config
+              sed -i '/\/dnceng\/internal\//d' installer/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
             inputs:
