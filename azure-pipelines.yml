@@ -1,12 +1,16 @@
 parameters:
 - name: runtimeBranch
-  displayName: Branch for runtime and aspnetcore repositories
+  displayName: Branch for runtime repository
   type: string
-  default: v5.0.3
+  default: v6.0.0-preview.1.21102.12
+- name: aspBranch
+  displayName: Branch for aspnetcore repository
+  type: string
+  default: v6.0.0-preview.1.21103.6
 - name: sdkBranch
   displayName: Branch for installer repository
   type: string
-  default: v5.0.103
+  default: v6.0.100-preview.1.21103.13
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -57,6 +61,7 @@ stages:
           - checkout: self
           - checkout: runtime
           - bash: |
+              set -e
               git -C runtime checkout ${{ parameters.runtimeBranch }}
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
@@ -80,7 +85,8 @@ stages:
           - checkout: aspnetcore
             submodules: true
           - bash: |
-              git -C aspnetcore checkout ${{ parameters.runtimeBranch }}
+              set -e
+              git -C aspnetcore checkout ${{ parameters.aspBranch }}
               git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
               dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile aspnetcore/NuGet.config
@@ -95,6 +101,7 @@ stages:
                 dotnet-runtime-*-freebsd-x64.tar.gz
                 Microsoft.*.freebsd-x64.*.nupkg
           - bash: |
+              set -e
               ls -lR runtime
               mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
@@ -118,6 +125,7 @@ stages:
           - checkout: self
           - checkout: installer
           - bash: |
+              set -e
               git -C installer checkout ${{ parameters.sdkBranch }}
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
               dotnet nuget remove source msbuild --configfile installer/NuGet.config
@@ -149,6 +157,7 @@ stages:
               targetPath: '$(Build.SourcesDirectory)/aspnetcore/artifacts/installers/Release'
               patterns: 'aspnetcore-runtime-*'
           - bash: |
+              set -e
               ls -lR runtime
               ls -lR aspnetcore
               mkdir -p installer/artifacts/obj/redist/Release/downloads/

@@ -1,39 +1,37 @@
-From 80531576c3f4dcfe863ab513094e8e65aceb962d Mon Sep 17 00:00:00 2001
+From 4fed51358288e646b82f4fd598435f125f985177 Mon Sep 17 00:00:00 2001
 From: ta264 <ta264@users.noreply.github.com>
-Date: Fri, 29 Jan 2021 19:25:11 +0000
-Subject: [PATCH] freebsd support
+Date: Fri, 26 Feb 2021 08:42:34 +0000
+Subject: [PATCH] FreeBSD support
 
 ---
- Directory.Build.props                                           | 1 +
- NuGet.config                                                    | 1 +
- eng/Dependencies.props                                          | 1 +
- eng/Versions.props                                              | 2 +-
- .../App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj     | 2 +-
- 5 files changed, 5 insertions(+), 2 deletions(-)
+ Directory.Build.props  | 1 +
+ eng/Dependencies.props | 1 +
+ 2 files changed, 2 insertions(+)
 
 diff --git a/Directory.Build.props b/Directory.Build.props
-index 07e3d34055..ac32e584ac 100644
+index f2f54bab5d..cd41aba973 100644
 --- a/Directory.Build.props
 +++ b/Directory.Build.props
-@@ -160,6 +160,7 @@
-       win-x86;
-       win-arm;
+@@ -163,6 +163,7 @@
        win-arm64;
-+      freebsd-x64;
        osx-x64;
+       osx-arm64;
++      freebsd-x64;
        linux-musl-x64;
        linux-musl-arm;
+       linux-musl-arm64;
 diff --git a/eng/Dependencies.props b/eng/Dependencies.props
-index 36a24451f0..5a5a2fa9dd 100644
+index 4858ba89c5..853b455267 100644
 --- a/eng/Dependencies.props
 +++ b/eng/Dependencies.props
 @@ -91,6 +91,7 @@ and are generated based on the last package release.
-     <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.win-x86" />
-     <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.win-arm" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.win-arm64" />
-+    <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.osx-x64" />
+     <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.osx-arm64" />
++    <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" />
      <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-arm" />
-2.25.1
+     <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-arm64" />
+-- 
+2.30.0
 
