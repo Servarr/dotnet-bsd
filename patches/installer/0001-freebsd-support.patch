@@ -1,38 +1,36 @@
-From ecfb7edc726e8de389b573d901be73e20e9027bf Mon Sep 17 00:00:00 2001
+From 3cd24046afa9c2ab5644b1f299a92cbc9c5b82e0 Mon Sep 17 00:00:00 2001
 From: ta264 <ta264@users.noreply.github.com>
-Date: Mon, 1 Feb 2021 17:22:10 +0000
-Subject: [PATCH] freebsd support
+Date: Fri, 26 Feb 2021 09:08:27 +0000
+Subject: [PATCH] FreeBSD support
 
 ---
- NuGet.config                                       | 4 ++--
- src/redist/targets/GenerateBundledVersions.targets | 4 ++--
+ src/redist/targets/GenerateBundledVersions.targets | 3 ++-
  src/redist/targets/GetRuntimeInformation.targets   | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/redist/targets/GenerateBundledVersions.targets b/src/redist/targets/GenerateBundledVersions.targets
-index 43b35ea06..00c2520b3 100644
+index 51866d564..13ff7a8e1 100644
 --- a/src/redist/targets/GenerateBundledVersions.targets
 +++ b/src/redist/targets/GenerateBundledVersions.targets
-@@ -73,7 +73,7 @@
- 
-       <NetCore31RuntimePackRids Include="@(NetCore30RuntimePackRids)"/>
- 
--      <NetCore5AppHostRids Include="@(NetCore31RuntimePackRids)"/>
-+      <NetCore5AppHostRids Include="@(NetCore31RuntimePackRids);freebsd-x64;"/>
+@@ -79,6 +79,7 @@
+       <Net50AppHostRids Include="
+           @(NetCore31RuntimePackRids);
+           linux-musl-arm;
++          freebsd-x64;
+           "/>
        
-       <NetCore5RuntimePackRids Include="
-           @(NetCore5AppHostRids);
-@@ -108,7 +108,7 @@
-       <Crossgen2SupportedRids Include="linux-musl-x64;linux-x64;win-x64" />
+       <Net50RuntimePackRids Include="
+@@ -115,7 +116,7 @@
+       <Crossgen2SupportedRids Include="@(Net50Crossgen2SupportedRids)" />
  
        <AspNetCore31RuntimePackRids Include="@(AspNetCore30RuntimePackRids)" />
--      <AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);win-arm64" />
-+      <AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);win-arm64;freebsd-x64" />
-       <AspNetCoreRuntimePackRids Include="@(AspNetCore50RuntimePackRids)" />
+-      <AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);linux-musl-arm;win-arm64" />
++      <AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);linux-musl-arm;win-arm64;freebsd-x64" />
+       <AspNetCoreRuntimePackRids Include="@(AspNetCore50RuntimePackRids);osx-arm64" />
  
        <WindowsDesktop30RuntimePackRids Include="win-x64;win-x86" />
 diff --git a/src/redist/targets/GetRuntimeInformation.targets b/src/redist/targets/GetRuntimeInformation.targets
-index 9f53268ab..0ba2fc8dc 100644
+index ce6e3b14c..015845125 100644
 --- a/src/redist/targets/GetRuntimeInformation.targets
 +++ b/src/redist/targets/GetRuntimeInformation.targets
 @@ -4,7 +4,7 @@
