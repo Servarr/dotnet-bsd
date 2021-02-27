@@ -90,7 +90,6 @@ stages:
               git -C aspnetcore checkout ${{ parameters.aspBranch }}
               git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
-              dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile aspnetcore/NuGet.config
               sed -i '/\/dnceng\/internal\//d' aspnetcore/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
@@ -133,7 +132,6 @@ stages:
               dotnet nuget remove source nuget-build --configfile installer/NuGet.config || true
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
               dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping --name aspnetcore --configfile installer/NuGet.config
-              dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile aspnetcore/NuGet.config
               sed -i '/\/dnceng\/internal\//d' installer/NuGet.config
             displayName: Apply patches
           - task: DownloadPipelineArtifact@2
