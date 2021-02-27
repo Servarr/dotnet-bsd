@@ -68,7 +68,7 @@ stages:
           - bash: |
               DOTNET_DOCKER_TAG="mcr.microsoft.com/dotnet-buildtools/prereqs:$(curl -s https://raw.githubusercontent.com/dotnet/versions/master/build-info/docker/image-info.dotnet-dotnet-buildtools-prereqs-docker-main.json | jq -r '.repos[0].images[] | select(.platforms[0].dockerfile | contains("freebsd/11")) | .platforms[0].simpleTags[0]')"
               echo $DOTNET_DOCKER_TAG
-              docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/build.sh -c Release -cross -os freebsd /p:BuildNumberMajor=21102 /p:BuildNumberMinor=12
+              docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/build.sh -ci -c Release -cross -os freebsd /p:BuildNumberMajor=21102 /p:BuildNumberMinor=12 /p:OfficialBuildId=20210202.12 /p:IsEligibleForNgenOptimization=false
             displayName: Build Runtime
           - publish: '$(Build.SourcesDirectory)/runtime/artifacts/packages/Release/Shipping'
             artifact: RuntimePackages
@@ -106,7 +106,7 @@ stages:
               ls -lR runtime
               mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
-              aspnetcore/build.sh -c Release -ci --os-name freebsd -pack -nobl /p:CrossgenOutput=false /p:OfficialBuildId=$(date +%Y%m%d)-99
+              aspnetcore/build.sh -c Release -ci --os-name freebsd -pack -nobl /p:CrossgenOutput=false /p:BuildNumberMajor=21103 /p:BuildNumberMinor=6 /p:OfficialBuildId=20210203.6
             displayName: Build AspNetCore
           - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/packages/Release/Shipping'
             artifact: AspNetCorePackages
@@ -129,8 +129,8 @@ stages:
               set -e
               git -C installer checkout ${{ parameters.sdkBranch }}
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
-              dotnet nuget remove source msbuild --configfile installer/NuGet.config
-              dotnet nuget remove source nuget-build --configfile installer/NuGet.config
+              dotnet nuget remove source msbuild --configfile installer/NuGet.config || true
+              dotnet nuget remove source nuget-build --configfile installer/NuGet.config || true
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
               dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping --name aspnetcore --configfile installer/NuGet.config
               dotnet nuget add source https://pkgs.dev.azure.com/Servarr/Servarr/_packaging/dotnet-bsd-crossbuild/nuget/v3/index.json --name dotnet-bsd-crossbuild --configfile aspnetcore/NuGet.config
@@ -164,7 +164,7 @@ stages:
               mkdir -p installer/artifacts/obj/redist/Release/downloads/
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
               cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-* installer/artifacts/obj/redist/Release/downloads/
-              installer/build.sh -c Release -ci  -pack -nobl --runtime-id freebsd-x64 /p:OSName=freebsd /p:CrossgenOutput=false /p:OfficialBuildId=$(date +%Y%m%d)-99 /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=True
+              installer/build.sh -c Release -ci  -pack -nobl --runtime-id freebsd-x64 /p:OSName=freebsd /p:CrossgenOutput=false /p:BuildNumberMajor=21103 /p:BuildNumberMinor=13 /p:OfficialBuildId=20210203.13 /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=True
             displayName: Build Installer
           - publish: '$(Build.SourcesDirectory)/installer/artifacts/packages/Release/Shipping'
             artifact: Installer
