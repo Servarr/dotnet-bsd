@@ -88,7 +88,8 @@ stages:
           - bash: |
               set -e
               git -C aspnetcore checkout ${{ parameters.aspBranch }}
-              git -C aspnetcore apply ../dotnet-bsd/patches/aspnetcore/0001-freebsd-support.patch
+              sed -i '/linux-x64;/a \ \ \ \ \ \ freebsd-x64;' aspnetcore/Directory.Build.props
+              sed -i '/<LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" \/>/a \ \ \ \ <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" \/>' aspnetcore/eng/Dependencies.props
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
               sed -i '/\/dnceng\/internal\//d' aspnetcore/NuGet.config
             displayName: Apply patches
@@ -128,6 +129,8 @@ stages:
               set -e
               git -C installer checkout ${{ parameters.sdkBranch }}
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
+              sed -i 's/NetCore5AppHostRids Include="@(NetCore31RuntimePackRids)/NetCore5AppHostRids Include="@(NetCore31RuntimePackRids);freebsd-x64/' installer/src/redist/targets/GenerateBundledVersions.targets
+              sed -i 's/AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids)/AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);freebsd-x64/' installer/src/redist/targets/GenerateBundledVersions.targets
               dotnet nuget remove source msbuild --configfile installer/NuGet.config || true
               dotnet nuget remove source nuget-build --configfile installer/NuGet.config || true
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
