@@ -2,15 +2,15 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v6.0.0-preview.1
+  default: v6.0.0-preview.3
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v6.0.0-preview.1
+  default: v6.0.0-preview.3
 - name: sdkBranch
   displayName: Tag for installer repository
   type: string
-  default: v6.0.100-preview.1
+  default: v6.0.100-preview.3
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -63,6 +63,7 @@ stages:
           - bash: |
               set -e
               git -C runtime tag | grep ${{ parameters.runtimeBranch }} | xargs git -C runtime checkout
+              git -C runtime revert -n 6055dfa7ecb7628fdb2570d8897e83520f69f280
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
@@ -76,9 +77,9 @@ stages:
           - publish: '$(Build.SourcesDirectory)/runtime/artifacts/packages/Release/Shipping'
             artifact: RuntimePackages
             displayName: Publish Runtime
-          - publish: '$(Build.SourcesDirectory)/runtime/artifacts/logs'
-            artifact: RuntimeLogs
-            displayName: Publish Build Logs
+          # - publish: '$(Build.SourcesDirectory)/runtime/artifacts/logs'
+          #   artifact: RuntimeLogs
+          #   displayName: Publish Build Logs
 
 
   - stage: AspNetCore
