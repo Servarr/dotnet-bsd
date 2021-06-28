@@ -139,8 +139,8 @@ stages:
               set -e
               git -C installer tag | grep ${{ parameters.sdkBranch }} | xargs git -C installer checkout
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
-              sed -i 's/NetCore5AppHostRids Include="@(NetCore31RuntimePackRids)/NetCore5AppHostRids Include="@(NetCore31RuntimePackRids);freebsd-x64/' installer/src/redist/targets/GenerateBundledVersions.targets
-              sed -i 's/AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids)/AspNetCore50RuntimePackRids Include="@(AspNetCore31RuntimePackRids);freebsd-x64/' installer/src/redist/targets/GenerateBundledVersions.targets
+              sed -i 's/@(NetCore31RuntimePackRids);/@(NetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
+              sed -i 's/@(AspNetCore31RuntimePackRids);/@(AspNetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
               dotnet nuget remove source msbuild --configfile installer/NuGet.config || true
               dotnet nuget remove source nuget-build --configfile installer/NuGet.config || true
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name runtime --configfile installer/NuGet.config
