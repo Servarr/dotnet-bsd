@@ -8,6 +8,10 @@ parameters:
   type: string
   default: v6.0.0-preview.3
 - name: sdkBranch
+  displayName: Tag for sdk repository
+  type: string
+  default: v6.0.100-preview.3
+- name: installerBranch
   displayName: Tag for installer repository
   type: string
   default: v6.0.100-preview.3
@@ -27,6 +31,11 @@ resources:
     endpoint: Servarr
     name: dotnet/aspnetcore
     ref: release/5.0
+  - repository: sdk
+    type: github
+    endpoint: Servarr
+    name: dotnet/sdk
+    ref: release/5.0.1xx
   - repository: installer
     type: github
     endpoint: Servarr
@@ -43,6 +52,7 @@ pr:
 
 stages:
   - stage: Runtime
+    dependsOn: []
 
     pool:
       vmImage: 'ubuntu-20.04'
@@ -72,14 +82,46 @@ stages:
               echo $DOTNET_DOCKER_TAG
               calculate_build_id $(git -C runtime tag --points-at HEAD)
               echo $OFFICIALBUILDID
-              docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/eng/build.sh -ci -c Release -cross -os freebsd /p:IsEligibleForNgenOptimization=false /p:OfficialBuildId=$OFFICIALBUILDID
+              docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/eng/build.sh -ci -c Release -cross -os freebsd /p:IsEligibleForNgenOptimization=false /p:OfficialBuildId=$OFFICIALBUILDID || true
             displayName: Build Runtime
           - publish: '$(Build.SourcesDirectory)/runtime/artifacts/packages/Release/Shipping'
             artifact: RuntimePackages
             displayName: Publish Runtime
-          # - publish: '$(Build.SourcesDirectory)/runtime/artifacts/logs'
-          #   artifact: RuntimeLogs
-          #   displayName: Publish Build Logs
+          - publish: '$(Build.SourcesDirectory)/runtime/artifacts/log'
+            condition: succeededOrFailed()
+            artifact: RuntimeLogs
+            displayName: Publish Build Logs
+
+  - stage: Sdk
+    dependsOn: []
+
+    pool:
+      vmImage: 'ubuntu-20.04'
+
+    jobs:
+      - job: Sdk
+        timeoutInMinutes: 0
+        steps:
+          - checkout: self
+          - checkout: sdk
+          - bash: |
+              set -e
+              git -C sdk tag | grep ${{ parameters.sdkBranch }} | xargs git -C sdk checkout
+              git -C sdk revert -n 9a1e8af8667f9315b5c9a61aae3f5c07d467f37c -m 1 -Xours
+            displayName: Checkout and patch
+          - bash: |
+              source dotnet-bsd/common.sh
+              calculate_build_id $(git -C sdk tag --points-at HEAD)
+              echo $OFFICIALBUILDID
+              sdk/build.sh -c Release -pack -ci /p:OfficialBuildId=$OFFICIALBUILDID
+            displayName: Build SDK
+          - publish: '$(Build.SourcesDirectory)/sdk/artifacts/packages/Release/NonShipping/'
+            artifact: SdkPackages
+            displayName: Publish SDK
+          - publish: '$(Build.SourcesDirectory)/sdk/artifacts/log'
+            condition: succeededOrFailed()
+            artifact: SdkLogs
+            displayName: Publish Build Logs
 
 
   - stage: AspNetCore
@@ -116,7 +158,7 @@ stages:
               ls -lR runtime
               mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
-              aspnetcore/eng/build.sh -c Release -ci --os-name freebsd -pack -nobl /p:CrossgenOutput=false /p:OfficialBuildId=$OFFICIALBUILDID
+              aspnetcore/eng/build.sh -c Release -ci --os-name freebsd -pack /p:CrossgenOutput=false /p:OfficialBuildId=$OFFICIALBUILDID
             displayName: Build AspNetCore
           - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/packages/Release/Shipping'
             artifact: AspNetCorePackages
@@ -124,9 +166,16 @@ stages:
           - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/installers/Release'
             artifact: AspNetCoreInstallers
             displayName: Publish AspNetCore Installers
+          - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/log'
+            condition: succeededOrFailed()
+            artifact: AspNetCoreLogs
+            displayName: Publish Build Logs
+
 
   - stage: Installer
-    dependsOn: AspNetCore
+    dependsOn:
+      - AspNetCore
+      - Sdk
     pool:
       vmImage: 'ubuntu-20.04'
     jobs:
@@ -137,7 +186,7 @@ stages:
           - checkout: installer
           - bash: |
               set -e
-              git -C installer tag | grep ${{ parameters.sdkBranch }} | xargs git -C installer checkout
+              git -C installer tag | grep ${{ parameters.installerBranch }} | xargs git -C installer checkout
               git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
               sed -i 's/@(NetCore31RuntimePackRids);/@(NetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
               sed -i 's/@(AspNetCore31RuntimePackRids);/@(AspNetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
@@ -168,6 +217,13 @@ stages:
               artifactName: AspNetCoreInstallers
               targetPath: '$(Build.SourcesDirectory)/aspnetcore/artifacts/installers/Release'
               patterns: 'aspnetcore-runtime-*'
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              artifactName: SdkPackages
+              targetPath: '$(Build.SourcesDirectory)/sdk/artifacts/packages/Release/NonShipping/'
+              patterns: |
+                dotnet-toolset-internal-*.zip
           - bash: |
               source dotnet-bsd/common.sh
               calculate_build_id $(git -C installer tag --points-at HEAD)
@@ -177,8 +233,13 @@ stages:
               mkdir -p installer/artifacts/obj/redist/Release/downloads/
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
               cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-* installer/artifacts/obj/redist/Release/downloads/
-              installer/build.sh -c Release -ci  -pack -nobl --runtime-id freebsd-x64 /p:OSName=freebsd /p:CrossgenOutput=false /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=True /p:OfficialBuildId=$OFFICIALBUILDID
+              cp sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip installer/artifacts/obj/redist/Release/downloads/
+              installer/build.sh -c Release -ci  -pack --runtime-id freebsd-x64 /p:OSName=freebsd /p:CrossgenOutput=false /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=True /p:OfficialBuildId=$OFFICIALBUILDID
             displayName: Build Installer
           - publish: '$(Build.SourcesDirectory)/installer/artifacts/packages/Release/Shipping'
             artifact: Installer
             displayName: Publish Installer
+          - publish: '$(Build.SourcesDirectory)/installer/artifacts/log'
+            condition: succeededOrFailed()
+            artifact: InstallerLogs
+            displayName: Publish Build Logs
