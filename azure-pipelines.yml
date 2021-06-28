@@ -2,19 +2,19 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v6.0.0-preview.3
+  default: v6.0.0-preview.5
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v6.0.0-preview.3
+  default: v6.0.0-preview.5
 - name: sdkBranch
   displayName: Tag for sdk repository
   type: string
-  default: v6.0.100-preview.3
+  default: v6.0.100-preview.5
 - name: installerBranch
   displayName: Tag for installer repository
   type: string
-  default: v6.0.100-preview.3
+  default: v6.0.100-preview.5
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -140,6 +140,7 @@ stages:
               git -C aspnetcore tag | grep ${{ parameters.aspBranch }} | xargs git -C aspnetcore checkout
               sed -i '/linux-x64;/a \ \ \ \ \ \ freebsd-x64;' aspnetcore/Directory.Build.props
               sed -i '/<LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" \/>/a \ \ \ \ <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" \/>' aspnetcore/eng/Dependencies.props
+              sed -i 's/<Reference Include="Microsoft.NETCore.App.Crossgen2/<Reference Condition="'\''$(CrossgenOutput)'\'' == '\''true'\''" Include="Microsoft.NETCore.App.Crossgen2/' aspnetcore/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
               sed -i '/\/dnceng\/internal\//d' aspnetcore/NuGet.config
             displayName: Checkout and patch
