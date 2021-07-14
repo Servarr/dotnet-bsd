@@ -2,19 +2,19 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v6.0.0-preview.5
+  default: v6.0.0-preview.6
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v6.0.0-preview.5
+  default: v6.0.0-preview.6
 - name: sdkBranch
   displayName: Tag for sdk repository
   type: string
-  default: v6.0.100-preview.5
+  default: v6.0.100-preview.6
 - name: installerBranch
   displayName: Tag for installer repository
   type: string
-  default: v6.0.100-preview.5
+  default: v6.0.100-preview.6
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -188,7 +188,7 @@ stages:
           - bash: |
               set -e
               git -C installer tag | grep ${{ parameters.installerBranch }} | xargs git -C installer checkout
-              git -C installer apply ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
+              git -C installer apply -C0 ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
               sed -i 's/@(NetCore31RuntimePackRids);/@(NetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
               sed -i 's/@(AspNetCore31RuntimePackRids);/@(AspNetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
               dotnet nuget remove source msbuild --configfile installer/NuGet.config || true
