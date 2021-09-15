@@ -5,12 +5,12 @@ set -e
 function calculate_build_id()
 {
     local TAG=$1
-    local REGEX='-preview\.[0-9]\.([0-9]{5})\.([0-9]{1,2})'
+    local REGEX='-(preview|rc)\.[0-9]\.([0-9]{5})\.([0-9]{1,2})'
 
     if [[ $TAG =~ $REGEX ]]
     then
-        local MAJOR=${BASH_REMATCH[1]}
-        local MINOR=${BASH_REMATCH[2]}
+        local MAJOR=${BASH_REMATCH[2]}
+        local MINOR=${BASH_REMATCH[3]}
 
         YEAR=$((MAJOR / 1000 + 2000))
         MONTH=$(((MAJOR % 1000) / 50))
