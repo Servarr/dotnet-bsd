@@ -73,9 +73,8 @@ stages:
           - bash: |
               set -e
               git -C runtime tag | grep ${{ parameters.runtimeBranch }} | xargs git -C runtime checkout
-              git -C runtime cherry-pick -n f83a9d9689433ce522b91e74a9631c83847e3b64
               git -C runtime cherry-pick -n 3633a7d0930abaca701385c1059b80ca157e98c6
-              git -C runtime apply ../dotnet-bsd/patches/runtime/0001-Enable-the-mono-subset-to-build-on-FreeBSD-x64-57027.patch
+              git -C runtime cherry-pick -n 3e6d492bdf6fbf2d8af3871379f31dcc6e27716b
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
