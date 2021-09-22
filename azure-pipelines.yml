@@ -2,15 +2,15 @@ parameters:
 - name: runtimeBranch
   displayName: Branch for runtime repository
   type: string
-  default: v5.0.3
+  default: v5.0.10
 - name: aspBranch
   displayName: Branch for aspnetcore repository
   type: string
-  default: v5.0.3
+  default: v5.0.10
 - name: sdkBranch
   displayName: Branch for installer repository
   type: string
-  default: v5.0.103
+  default: v5.0.401
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -88,6 +88,7 @@ stages:
           - bash: |
               set -e
               git -C aspnetcore checkout ${{ parameters.aspBranch }}
+              git -C aspnetcore cherry-pick -n 51a999890f85863865191e2a3e67852d2ea60130
               sed -i '/linux-x64;/a \ \ \ \ \ \ freebsd-x64;' aspnetcore/Directory.Build.props
               sed -i '/<LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" \/>/a \ \ \ \ <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" \/>' aspnetcore/eng/Dependencies.props
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
