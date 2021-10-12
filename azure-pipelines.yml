@@ -2,15 +2,15 @@ parameters:
 - name: runtimeBranch
   displayName: Branch for runtime repository
   type: string
-  default: v5.0.10
+  default: v5.0.11
 - name: aspBranch
   displayName: Branch for aspnetcore repository
   type: string
-  default: v5.0.10
+  default: v5.0.11
 - name: sdkBranch
   displayName: Branch for installer repository
   type: string
-  default: v5.0.401
+  default: v5.0.402
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -66,7 +66,7 @@ stages:
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
-              DOTNET_DOCKER_TAG="mcr.microsoft.com/dotnet-buildtools/prereqs:$(curl -s https://raw.githubusercontent.com/dotnet/versions/master/build-info/docker/image-info.dotnet-dotnet-buildtools-prereqs-docker-main.json | jq -r '.repos[0].images[] | select(.platforms[0].dockerfile | contains("freebsd/11")) | .platforms[0].simpleTags[0]')"
+              DOTNET_DOCKER_TAG=mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-11-20210917001307-f13d79e
               echo $DOTNET_DOCKER_TAG
               docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/build.sh -ci -c Release -cross -os freebsd /p:BuildNumberMajor=21102 /p:BuildNumberMinor=12 /p:OfficialBuildId=20210202.12 /p:IsEligibleForNgenOptimization=false
             displayName: Build Runtime
@@ -88,7 +88,6 @@ stages:
           - bash: |
               set -e
               git -C aspnetcore checkout ${{ parameters.aspBranch }}
-              git -C aspnetcore cherry-pick -n 51a999890f85863865191e2a3e67852d2ea60130
               sed -i '/linux-x64;/a \ \ \ \ \ \ freebsd-x64;' aspnetcore/Directory.Build.props
               sed -i '/<LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" \/>/a \ \ \ \ <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" \/>' aspnetcore/eng/Dependencies.props
               dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping --name local --configfile aspnetcore/NuGet.config
