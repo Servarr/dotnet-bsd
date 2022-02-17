@@ -2,15 +2,15 @@ parameters:
 - name: runtimeBranch
   displayName: Branch for runtime repository
   type: string
-  default: v5.0.11
+  default: v5.0.14
 - name: aspBranch
   displayName: Branch for aspnetcore repository
   type: string
-  default: v5.0.11
+  default: v5.0.14
 - name: sdkBranch
   displayName: Branch for installer repository
   type: string
-  default: v5.0.402
+  default: v5.0.405
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -31,15 +31,15 @@ resources:
     type: github
     endpoint: Servarr
     name: dotnet/installer
-    ref: release/5.0.1xx
+    ref: release/5.0.4xx
 
 trigger:
   branches:
     include:
-    - master
+    - v5
 
 pr:
-- master
+- v5
 
 stages:
   - stage: Runtime
