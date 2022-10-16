@@ -2,19 +2,19 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v7.0.0-preview.1
+  default: v7.0.0-rc.2
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v7.0.0-preview.1
+  default: v7.0.0-rc.2
 - name: sdkBranch
   displayName: Tag for sdk repository
   type: string
-  default: v7.0.100-preview.1
+  default: v7.0.100-rc.2
 - name: installerBranch
   displayName: Tag for installer repository
   type: string
-  default: v7.0.100-preview.1
+  default: v7.0.100-rc.2
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -73,6 +73,7 @@ stages:
           - bash: |
               set -e
               git -C runtime tag | grep ${{ parameters.runtimeBranch }} | xargs git -C runtime checkout
+              git -C runtime cherry-pick -n 6c2758897402e88562fa9875c2c359ac6ef15b1f
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
