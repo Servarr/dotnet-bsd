@@ -72,7 +72,7 @@ stages:
           - checkout: runtime
           - bash: |
               set -e
-              git -C runtime tag | grep ${{ parameters.runtimeBranch }} | xargs git -C runtime checkout
+              git -C runtime checkout ${{ parameters.runtimeBranch }}
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
@@ -136,7 +136,7 @@ stages:
             submodules: true
           - bash: |
               set -e
-              git -C aspnetcore tag | grep ${{ parameters.aspBranch }} | xargs git -C aspnetcore checkout
+              git -C aspnetcore checkout ${{ parameters.aspBranch }}
               git -C aspnetcore submodule update --init
               sed -i '/linux-x64;/a \ \ \ \ \ \ freebsd-x64;' aspnetcore/Directory.Build.props
               sed -i '/<LatestPackageReference Include="Microsoft.NETCore.App.Runtime.linux-x64" \/>/a \ \ \ \ <LatestPackageReference Include="Microsoft.NETCore.App.Runtime.freebsd-x64" \/>' aspnetcore/eng/Dependencies.props
