@@ -161,7 +161,7 @@ stages:
               ls -lR runtime
               mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
               cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
-              aspnetcore/eng/build.sh -c Release -ci --os-name freebsd -pack /p:CrossgenOutput=false /p:OfficialBuildId=$OFFICIALBUILDID
+              aspnetcore/eng/build.sh -c Release -ci --os-name freebsd -pack -no-build-nodejs /p:CrossgenOutput=false /p:OfficialBuildId=$OFFICIALBUILDID
             displayName: Build AspNetCore
           - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/packages/Release/Shipping'
             artifact: AspNetCorePackages
