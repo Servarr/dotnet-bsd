@@ -156,7 +156,8 @@ stages:
                 Microsoft.*.freebsd-x64.*.nupkg
           - task: NodeTool@0
             inputs:
-              versionSource: '16.x'
+              versionSource: 'spec'
+              versionSpec: '16.x'
           - bash: |
               source dotnet-bsd/common.sh
               calculate_build_id $(git -C aspnetcore tag --points-at HEAD)
