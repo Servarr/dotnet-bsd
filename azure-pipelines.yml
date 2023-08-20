@@ -74,7 +74,7 @@ stages:
               set -e
               git -C runtime checkout ${{ parameters.runtimeBranch }}
               git -C runtime cherry-pick -n 3633a7d0930abaca701385c1059b80ca157e98c6
-              git -C runtime cherry-pick -n 3e6d492bdf6fbf2d8af3871379f31dcc6e27716b
+              git -C runtime cherry-pick -n 3e6d492bdf6fbf2d8af3871379f31dcc6e27716b -Xours
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
