@@ -77,7 +77,7 @@ stages:
             displayName: Checkout and patch
           - bash: |
               source dotnet-bsd/common.sh
-              get_runtime_docker
+              DOTNET_DOCKER_TAG=mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-11-20210917001307-f13d79e
               echo $DOTNET_DOCKER_TAG
               calculate_build_id $(git -C runtime tag --points-at HEAD)
               echo $OFFICIALBUILDID
