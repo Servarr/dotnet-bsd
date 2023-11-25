@@ -201,11 +201,11 @@ stages:
             artifact: AspNetCoreLogs
             displayName: Publish Build Logs
 
-
   - stage: Installer
     dependsOn:
       - AspNetCore
       - Sdk
+      - Aspire
     pool:
       vmImage: 'ubuntu-22.04'
     jobs:
