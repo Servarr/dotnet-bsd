@@ -119,12 +119,12 @@ stages:
               sed -i '/\/dnceng\/internal\//d' aspire/NuGet.config
             displayName: Checkout and patch
           - bash: |
-              aspire/build.sh --restore --build --pack --ci /p:OfficialBuildId=20231101.7
+              aspire/build.sh --restore --build --pack --ci -c Release /p:OfficialBuildId=20231101.7
             displayName: Build Aspire
           - publish: '$(Build.SourcesDirectory)/aspire/artifacts/packages/Release/Shipping/'
             artifact: AspirePackages
             displayName: Publish Aspire
-          - publish: '$(Build.SourcesDirectory)/sdk/artifacts/log'
+          - publish: '$(Build.SourcesDirectory)/aspire/artifacts/log'
             condition: succeededOrFailed()
             artifact: AspireLogs
             displayName: Publish Build Logs
