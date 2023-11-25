@@ -204,7 +204,6 @@ stages:
     dependsOn:
       - AspNetCore
       - Sdk
-      - Aspire
     pool:
       vmImage: 'ubuntu-22.04'
     jobs:
