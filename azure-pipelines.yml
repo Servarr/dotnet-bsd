@@ -86,7 +86,7 @@ stages:
             displayName: Checkout and patch
           - bash: |
               source dotnet-bsd/common.sh
-              DOTNET_DOCKER_TAG=mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-11-20210917001307-f13d79e
+              get_runtime_docker
               echo $DOTNET_DOCKER_TAG
               calculate_build_id $(git -C runtime tag --points-at HEAD)
               echo $OFFICIALBUILDID
@@ -116,10 +116,11 @@ stages:
           - bash: |
               set -e
               git -C aspire checkout ${{ parameters.aspireBranch }}
+              sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
               aspire/build.sh --restore --build --pack --ci /p:OfficialBuildId=20231101.7
-            displayName: Build SDK
+            displayName: Build Aspire
           - publish: '$(Build.SourcesDirectory)/aspire/artifacts/packages/Release/Shipping/'
             artifact: AspirePackages
             displayName: Publish Aspire
