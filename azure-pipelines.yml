@@ -128,7 +128,6 @@ stages:
             artifact: AspireLogs
             displayName: Publish Build Logs
 
-    jobs:
       - job: Sdk
         timeoutInMinutes: 0
         steps:
