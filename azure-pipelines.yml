@@ -116,7 +116,7 @@ stages:
           - bash: |
               set -e
               git -C aspire checkout ${{ parameters.aspireBranch }}
-              sed -i '/\/dnceng\/internal\//d' NuGet.config
+              sed -i '/\/dnceng\/internal\//d' aspire/NuGet.config
             displayName: Checkout and patch
           - bash: |
               aspire/build.sh --restore --build --pack --ci /p:OfficialBuildId=20231101.7
