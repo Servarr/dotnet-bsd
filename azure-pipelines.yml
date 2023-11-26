@@ -64,7 +64,7 @@ stages:
     dependsOn: []
 
     pool:
-      vmImage: 'ubuntu-22.04'
+      vmImage: 'ubuntu-20.04'
 
     jobs:
       - job: Setup
@@ -105,7 +105,7 @@ stages:
     dependsOn: []
 
     pool:
-      vmImage: 'ubuntu-22.04'
+      vmImage: 'ubuntu-20.04'
 
     jobs:
       - job: Aspire
@@ -155,7 +155,7 @@ stages:
   - stage: AspNetCore
     dependsOn: Runtime
     pool:
-      vmImage: 'ubuntu-22.04'
+      vmImage: 'ubuntu-20.04'
     jobs:
       - job: AspNetCore
         timeoutInMinutes: 0
@@ -206,7 +206,7 @@ stages:
       - AspNetCore
       - Sdk
     pool:
-      vmImage: 'ubuntu-22.04'
+      vmImage: 'ubuntu-20.04'
     jobs:
       - job: Installer
         timeoutInMinutes: 0
@@ -215,7 +215,7 @@ stages:
           - checkout: installer
           - bash: |
               set -e
-              git -C installer tag | grep ${{ parameters.installerBranch }} | xargs git -C installer checkout
+              git -C installer checkout ${{ parameters.installerBranch }}
               git -C installer apply -C0 ../dotnet-bsd/patches/installer/0001-freebsd-support.patch
               sed -i 's/@(NetCore31RuntimePackRids);/@(NetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
               sed -i 's/@(AspNetCore31RuntimePackRids);/@(AspNetCore31RuntimePackRids);freebsd-x64;/' installer/src/redist/targets/GenerateBundledVersions.targets
