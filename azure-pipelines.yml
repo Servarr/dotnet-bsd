@@ -2,23 +2,23 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v8.0.0
+  default: v8.0.4
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v8.0.0
+  default: v8.0.4
 - name: sdkBranch
   displayName: Tag for sdk repository
   type: string
-  default: v8.0.100
+  default: v8.0.204
 - name: aspireBranch
   displayName: Tag for aspire repository
   type: string
-  default: v8.0.0-preview.1.23557.2
+  default: v8.0.0-preview.5.24201.12
 - name: installerBranch
   displayName: Tag for installer repository
   type: string
-  default: v8.0.100
+  default: v8.0.204
 
 variables:
   runCounter: $[counter('runNumber', 1)]
@@ -39,17 +39,17 @@ resources:
     type: github
     endpoint: Servarr
     name: dotnet/sdk
-    ref: release/8.0.1xx
+    ref: release/8.0.4xx
   - repository: aspire
     type: github
     endpoint: Servarr
     name: dotnet/aspire
-    ref: release/8.0-preview1
+    ref: release/8.0-preview5
   - repository: installer
     type: github
     endpoint: Servarr
     name: dotnet/installer
-    ref: release/8.0.1xx
+    ref: release/8.0.2xx
 
 trigger:
   branches:
@@ -61,7 +61,6 @@ pr:
 
 stages:
   - stage: Runtime
-    dependsOn: []
 
     pool:
       vmImage: 'ubuntu-20.04'
@@ -85,11 +84,13 @@ stages:
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
+              set -ex
               source dotnet-bsd/common.sh
               get_runtime_docker
               echo $DOTNET_DOCKER_TAG
               calculate_build_id $(git -C runtime tag --points-at HEAD)
               echo $OFFICIALBUILDID
+
               docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/eng/build.sh -ci -c Release -cross -os FreeBSD /p:IsEligibleForNgenOptimization=false /p:OfficialBuildId=$OFFICIALBUILDID -subset Clr.Native+Host.Native
               docker run -e ROOTFS_DIR=/crossrootfs/x64 -v ${BUILD_SOURCESDIRECTORY}/runtime:/runtime $DOTNET_DOCKER_TAG /runtime/eng/build.sh -ci -c Release -cross -os FreeBSD /p:IsEligibleForNgenOptimization=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost
             displayName: Build Runtime
@@ -182,6 +183,7 @@ stages:
                 dotnet-runtime-*-freebsd-x64.tar.gz
                 Microsoft.*.freebsd-x64.*.nupkg
           - bash: |
+              set -e
               source dotnet-bsd/common.sh
               calculate_build_id $(git -C aspnetcore tag --points-at HEAD)
               echo $OFFICIALBUILDID
@@ -262,6 +264,7 @@ stages:
               patterns: |
                 dotnet-toolset-internal-*.zip
           - bash: |
+              set -e
               source dotnet-bsd/common.sh
               calculate_build_id $(git -C installer tag --points-at HEAD)
               echo $OFFICIALBUILDID
