@@ -84,9 +84,9 @@ stages:
               sed -i '/\/dnceng\/internal\//d' runtime/NuGet.config
             displayName: Checkout and patch
           - bash: |
-              set -ex
+              set -e
               source dotnet-bsd/common.sh
-              get_runtime_docker
+              DOTNET_DOCKER_TAG=mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-12-20240110235237-3fc5553
               echo $DOTNET_DOCKER_TAG
               calculate_build_id $(git -C runtime tag --points-at HEAD)
               echo $OFFICIALBUILDID
