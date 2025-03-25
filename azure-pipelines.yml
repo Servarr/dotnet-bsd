@@ -2,23 +2,23 @@ parameters:
 - name: runtimeBranch
   displayName: Tag for runtime repository
   type: string
-  default: v8.0.12
+  default: v8.0.14
 - name: aspBranch
   displayName: Tag for aspnetcore repository
   type: string
-  default: v8.0.12
+  default: v8.0.14
 - name: sdkBranch
   displayName: Tag for sdk repository
   type: string
-  default: v8.0.405
+  default: v8.0.407
 - name: aspireBranch
   displayName: Tag for aspire repository
   type: string
-  default: v8.2.1
+  default: v8.2.2
 - name: installerBranch
   displayName: Tag for installer repository
   type: string
-  default: v8.0.405
+  default: v8.0.407
 
 variables:
   runCounter: $[counter('runNumber', 1)]
