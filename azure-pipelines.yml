@@ -77,7 +77,9 @@ stages:
         timeoutInMinutes: 0
         steps:
           - checkout: self
+            fetchDepth: 1
           - checkout: runtime
+            fetchDepth: 1
           - bash: |
               set -e
               git -C runtime checkout ${{ parameters.runtimeBranch }}
@@ -113,7 +115,9 @@ stages:
         timeoutInMinutes: 0
         steps:
           - checkout: self
+            fetchDepth: 1
           - checkout: aspire
+            fetchDepth: 1
           - bash: |
               set -e
               git -C aspire checkout ${{ parameters.aspireBranch }}
@@ -138,7 +142,9 @@ stages:
         timeoutInMinutes: 0
         steps:
           - checkout: self
+            fetchDepth: 1
           - checkout: sdk
+            fetchDepth: 1
           - bash: |
               set -e
               git -C sdk checkout ${{ parameters.sdkBranch }}
@@ -166,8 +172,10 @@ stages:
         timeoutInMinutes: 0
         steps:
           - checkout: self
+            fetchDepth: 1
           - checkout: aspnetcore
             submodules: true
+            fetchDepth: 1
           - bash: |
               set -e
               git -C aspnetcore checkout ${{ parameters.aspBranch }}
@@ -218,7 +226,9 @@ stages:
         timeoutInMinutes: 0
         steps:
           - checkout: self
+            fetchDepth: 1
           - checkout: installer
+            fetchDepth: 1
           - bash: |
               set -e
               git -C installer checkout ${{ parameters.installerBranch }}
