@@ -100,7 +100,7 @@ stages:
             artifact: RuntimePackages
             displayName: Publish Runtime
           - publish: '$(Build.SourcesDirectory)/runtime/artifacts/log'
-            condition: succeededOrFailed()
+            condition: succeeded()
             artifact: RuntimeLogs
             displayName: Publish Build Logs
 
@@ -134,7 +134,7 @@ stages:
             artifact: AspirePackages
             displayName: Publish Aspire
           - publish: '$(Build.SourcesDirectory)/aspire/artifacts/log'
-            condition: succeededOrFailed()
+            condition: succeeded()
             artifact: AspireLogs
             displayName: Publish Build Logs
 
@@ -159,7 +159,7 @@ stages:
             artifact: SdkPackages
             displayName: Publish SDK
           - publish: '$(Build.SourcesDirectory)/sdk/artifacts/log'
-            condition: succeededOrFailed()
+            condition: succeeded()
             artifact: SdkLogs
             displayName: Publish Build Logs
 
@@ -211,7 +211,7 @@ stages:
             artifact: AspNetCoreInstallers
             displayName: Publish AspNetCore Installers
           - publish: '$(Build.SourcesDirectory)/aspnetcore/artifacts/log'
-            condition: succeededOrFailed()
+            condition: succeeded()
             artifact: AspNetCoreLogs
             displayName: Publish Build Logs
 
@@ -294,6 +294,6 @@ stages:
             artifact: Installer
             displayName: Publish Installer
           - publish: '$(Build.SourcesDirectory)/installer/artifacts/log'
-            condition: succeededOrFailed()
+            condition: succeeded()
             artifact: InstallerLogs
             displayName: Publish Build Logs
